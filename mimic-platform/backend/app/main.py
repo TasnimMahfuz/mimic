@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.routes import auth, mimic, materials
+from app.api.routes import auth, mimic, materials, chat
 from app.db.base import Base
 from app.db.session import engine
 from app.db.init_db import init_db
@@ -13,6 +13,7 @@ app = FastAPI()
 app.include_router(auth.router, prefix="/auth")
 app.include_router(mimic.router, prefix="/mimic")
 app.include_router(materials.router, prefix="/materials")
+app.include_router(chat.router, prefix="/chat")
 
 #@app.on_event("startup")
 #def on_startup():

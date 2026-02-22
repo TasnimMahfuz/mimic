@@ -5,3 +5,8 @@ psycopg2-binary
 python-dotenv
 passlib[bcrypt]
 python-jose
+langchain-groq
+langchain
+langchain-community
+pinecone-client
+requests
