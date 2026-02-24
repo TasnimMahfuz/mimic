@@ -6,11 +6,15 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from unittest.mock import MagicMock
 
 from app.main import app
 from app.db.base_class import Base
 from app.db.session import get_db
 from app.models.role import Role
+from app.api.deps import get_rag_service, get_llm_service
+from app.services.rag_service import RAGService
+from app.services.llm_service import LLMService
 
 
 # ---------- SQLITE MEMORY DB ----------

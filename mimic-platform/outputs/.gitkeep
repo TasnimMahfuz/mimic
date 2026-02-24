@@ -1,0 +1,3 @@
+# This directory stores MIMIC analysis run results
+# Each run creates a subdirectory: run_<id>/
+# Contents are generated dynamically during processing

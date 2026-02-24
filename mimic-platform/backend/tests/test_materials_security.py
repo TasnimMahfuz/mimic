@@ -1,4 +1,6 @@
 import pytest
+from app.api.deps import get_rag_service
+
 
 def test_student_cannot_upload_material(client):
     # 1. Register as a student
@@ -18,6 +20,7 @@ def test_student_cannot_upload_material(client):
     # This should fail with 403 Forbidden because of @require_teacher
     assert response.status_code == 403
     assert response.json()["detail"] == "Teacher only"
+
 
 def test_upload_empty_file(client):
     # 1. Register as teacher

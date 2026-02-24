@@ -80,3 +80,8 @@ Thumbs.db
 # Dependencies
 .next/
 out/
+
+
+#Unnecessary for now
+*.pdf
+*.md

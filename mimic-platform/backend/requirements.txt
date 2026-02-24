@@ -10,3 +10,13 @@ langchain
 langchain-community
 pinecone-client
 requests
+numpy
+astropy
+opencv-python
+pillow
+matplotlib
+pywavelets
+scikit-image
+hypothesis
+pytest
+alembic

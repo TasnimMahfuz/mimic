@@ -12,3 +12,6 @@ class CourseMaterial(Base):
     content = Column(Text)
 
     uploaded_by = Column(Integer, ForeignKey("users.id"))
+    
+    # Vector status: "synced", "pending", or "failed"
+    vector_status = Column(String, default="pending")
