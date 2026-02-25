@@ -1,0 +1,30 @@
+{
+  "run_id": "32d443c7-2d69-4abc-ada7-9c072158f740",
+  "timestamp": "2026-02-25T14:33:24.953559",
+  "parameters": {
+    "edge_strength": 0.5,
+    "angular_resolution": 16,
+    "smoothing": 1.0,
+    "photon_threshold": 10.0,
+    "enhancement_factor": 2.0
+  },
+  "input_file": "outputs/temp/32d443c7-2d69-4abc-ada7-9c072158f740_images.jpeg",
+  "image_shape": [
+    225,
+    225
+  ],
+  "scale_params": {
+    "min": 0.0,
+    "max": 255.0,
+    "range": 255.0
+  },
+  "visualizations": [
+    "outputs/run_32d443c7-2d69-4abc-ada7-9c072158f740/raw.png",
+    "outputs/run_32d443c7-2d69-4abc-ada7-9c072158f740/normalized.png",
+    "outputs/run_32d443c7-2d69-4abc-ada7-9c072158f740/wavelet_coefficients.png",
+    "outputs/run_32d443c7-2d69-4abc-ada7-9c072158f740/wavelet_edge.png",
+    "outputs/run_32d443c7-2d69-4abc-ada7-9c072158f740/curvelet_edge.png",
+    "outputs/run_32d443c7-2d69-4abc-ada7-9c072158f740/reconstruction.png"
+  ],
+  "execution_time_seconds": 2.3751442432403564
+}

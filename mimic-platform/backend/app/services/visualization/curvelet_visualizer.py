@@ -14,6 +14,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from typing import Dict, Optional
 import logging
 from pathlib import Path
+import cv2
 
 from ..transforms.fft_directional import CurveletCoefficients
 
@@ -70,8 +71,18 @@ class CurveletVisualizer:
                 if scale_idx in coefficients.coefficients:
                     if angle_idx in coefficients.coefficients[scale_idx]:
                         coeff = coefficients.coefficients[scale_idx][angle_idx]
+                        coeff_abs = np.abs(coeff)
+                        
+                        # Resize if needed to match edge_map shape
+                        if coeff_abs.shape != coefficients.shape:
+                            coeff_abs = cv2.resize(
+                                coeff_abs,
+                                (coefficients.shape[1], coefficients.shape[0]),
+                                interpolation=cv2.INTER_LINEAR
+                            )
+                        
                         # Add magnitude to edge map
-                        edge_map += np.abs(coeff)
+                        edge_map += coeff_abs
         
         # Normalize to [0, 1]
         if edge_map.max() > 0:
@@ -170,6 +181,14 @@ class CurveletVisualizer:
                     if angle_idx in coefficients.coefficients[scale_idx]:
                         coeff = coefficients.coefficients[scale_idx][angle_idx]
                         magnitude = np.abs(coeff)
+                        
+                        # Resize if needed to match output shape
+                        if magnitude.shape != coefficients.shape:
+                            magnitude = cv2.resize(
+                                magnitude,
+                                (coefficients.shape[1], coefficients.shape[0]),
+                                interpolation=cv2.INTER_LINEAR
+                            )
                         
                         # Update dominant orientation where this magnitude is larger
                         mask = magnitude > max_magnitude

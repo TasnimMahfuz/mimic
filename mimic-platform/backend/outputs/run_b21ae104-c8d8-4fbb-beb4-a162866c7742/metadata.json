@@ -1,0 +1,30 @@
+{
+  "run_id": "b21ae104-c8d8-4fbb-beb4-a162866c7742",
+  "timestamp": "2026-02-25T14:36:23.325541",
+  "parameters": {
+    "edge_strength": 0.5,
+    "angular_resolution": 16,
+    "smoothing": 1.0,
+    "photon_threshold": 10.0,
+    "enhancement_factor": 2.0
+  },
+  "input_file": "outputs/temp/b21ae104-c8d8-4fbb-beb4-a162866c7742_images.jpeg",
+  "image_shape": [
+    225,
+    225
+  ],
+  "scale_params": {
+    "min": 0.0,
+    "max": 255.0,
+    "range": 255.0
+  },
+  "visualizations": [
+    "outputs/run_b21ae104-c8d8-4fbb-beb4-a162866c7742/raw.png",
+    "outputs/run_b21ae104-c8d8-4fbb-beb4-a162866c7742/normalized.png",
+    "outputs/run_b21ae104-c8d8-4fbb-beb4-a162866c7742/wavelet_coefficients.png",
+    "outputs/run_b21ae104-c8d8-4fbb-beb4-a162866c7742/wavelet_edge.png",
+    "outputs/run_b21ae104-c8d8-4fbb-beb4-a162866c7742/curvelet_edge.png",
+    "outputs/run_b21ae104-c8d8-4fbb-beb4-a162866c7742/reconstruction.png"
+  ],
+  "execution_time_seconds": 1.9227206707000732
+}

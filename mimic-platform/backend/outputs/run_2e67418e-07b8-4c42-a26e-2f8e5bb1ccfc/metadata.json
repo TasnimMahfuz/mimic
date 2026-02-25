@@ -1,0 +1,30 @@
+{
+  "run_id": "2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc",
+  "timestamp": "2026-02-25T19:32:43.529819",
+  "parameters": {
+    "edge_strength": 0.5,
+    "angular_resolution": 16,
+    "smoothing": 1.0,
+    "photon_threshold": 10.0,
+    "enhancement_factor": 2.0
+  },
+  "input_file": "outputs/temp/2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc_12_images.jpeg",
+  "image_shape": [
+    168,
+    299
+  ],
+  "scale_params": {
+    "min": 64.0,
+    "max": 255.0,
+    "range": 191.0
+  },
+  "visualizations": [
+    "outputs/run_2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc/raw.png",
+    "outputs/run_2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc/normalized.png",
+    "outputs/run_2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc/wavelet_coefficients.png",
+    "outputs/run_2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc/wavelet_edge.png",
+    "outputs/run_2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc/curvelet_edge.png",
+    "outputs/run_2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc/reconstruction.png",
+    "outputs/run_2e67418e-07b8-4c42-a26e-2f8e5bb1ccfc/edge_overlay.png"
+  ]
+}

@@ -164,19 +164,18 @@ class WaveletTransform:
         threshold: float = 0.5
     ) -> np.ndarray:
         """
-        Extract edges from wavelet coefficients using threshold-based detection.
+        Extract edges from wavelet coefficients using adaptive percentile threshold.
         
         Detects edges by analyzing the magnitude of detail coefficients across
-        all scales. High-magnitude coefficients correspond to sharp transitions
-        (edges) in the image. The method combines horizontal, vertical, and
-        diagonal detail coefficients to produce a comprehensive edge map.
+        all scales. Uses adaptive percentile-based thresholding to ensure edges
+        are visible even with varying coefficient magnitudes.
         
         **Validates: Requirement 5.4**
         
         Args:
             coefficients: WaveletCoefficients object from decompose()
-            threshold: Edge strength threshold (0.0-1.0). Higher values produce
-                      fewer, stronger edges. Default: 0.5
+            threshold: Percentile threshold (0.0-1.0). Higher values produce
+                      fewer, stronger edges. Default: 0.5 (uses 50th percentile)
         
         Returns:
             Binary edge map as 2D numpy array (same size as original image)
@@ -197,12 +196,13 @@ class WaveletTransform:
             # Combine horizontal, vertical, and diagonal components
             magnitude = np.sqrt(cH**2 + cV**2 + cD**2)
             
-            # Normalize magnitude to [0, 1] range
-            if magnitude.max() > 0:
-                magnitude = magnitude / magnitude.max()
+            # Use adaptive percentile threshold - more lenient for astronomy images
+            # Convert threshold parameter to percentile (0.5 → 75th percentile)
+            percentile = 50 + (threshold * 25)  # Maps [0,1] to [50,75] instead of [50,100]
+            adaptive_thr = np.percentile(magnitude, percentile)
             
-            # Apply threshold to create binary edge map
-            level_edges = (magnitude > threshold).astype(np.float32)
+            # Apply adaptive threshold to create binary edge map
+            level_edges = (magnitude > adaptive_thr).astype(np.float32)
             
             edge_maps.append((level_edges, magnitude))
         
@@ -247,11 +247,19 @@ class WaveletTransform:
         if combined_edges.max() > 0:
             combined_edges = combined_edges / combined_edges.max()
         
-        # Apply final threshold to create binary edge map
-        binary_edges = (combined_edges > 0.3).astype(np.uint8)
+        # Apply final lenient threshold to ensure we get edges
+        # Use 10th percentile of non-zero values for astronomy images
+        if np.any(combined_edges > 0):
+            final_thr = np.percentile(combined_edges[combined_edges > 0], 10)
+        else:
+            final_thr = 0.01
         
+        binary_edges = (combined_edges > final_thr).astype(np.uint8)
+        
+        edge_count = np.sum(binary_edges)
         logger.info(
-            f"Edge extraction complete: {np.sum(binary_edges)} edge pixels detected"
+            f"Edge extraction complete: {edge_count} edge pixels detected "
+            f"(adaptive threshold: {final_thr:.4f})"
         )
         
         return binary_edges

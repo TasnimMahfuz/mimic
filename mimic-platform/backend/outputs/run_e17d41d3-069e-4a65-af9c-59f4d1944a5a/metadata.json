@@ -1,0 +1,30 @@
+{
+  "run_id": "e17d41d3-069e-4a65-af9c-59f4d1944a5a",
+  "timestamp": "2026-02-25T14:45:43.100525",
+  "parameters": {
+    "edge_strength": 0.5,
+    "angular_resolution": 16,
+    "smoothing": 1.0,
+    "photon_threshold": 10.0,
+    "enhancement_factor": 2.0
+  },
+  "input_file": "outputs/temp/e17d41d3-069e-4a65-af9c-59f4d1944a5a_images_chandra.jpeg",
+  "image_shape": [
+    225,
+    225
+  ],
+  "scale_params": {
+    "min": 0.0,
+    "max": 255.0,
+    "range": 255.0
+  },
+  "visualizations": [
+    "outputs/run_e17d41d3-069e-4a65-af9c-59f4d1944a5a/raw.png",
+    "outputs/run_e17d41d3-069e-4a65-af9c-59f4d1944a5a/normalized.png",
+    "outputs/run_e17d41d3-069e-4a65-af9c-59f4d1944a5a/wavelet_coefficients.png",
+    "outputs/run_e17d41d3-069e-4a65-af9c-59f4d1944a5a/wavelet_edge.png",
+    "outputs/run_e17d41d3-069e-4a65-af9c-59f4d1944a5a/curvelet_edge.png",
+    "outputs/run_e17d41d3-069e-4a65-af9c-59f4d1944a5a/reconstruction.png"
+  ],
+  "execution_time_seconds": 2.361382484436035
+}

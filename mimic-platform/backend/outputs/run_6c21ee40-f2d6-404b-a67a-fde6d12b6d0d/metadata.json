@@ -1,0 +1,29 @@
+{
+  "run_id": "6c21ee40-f2d6-404b-a67a-fde6d12b6d0d",
+  "timestamp": "2026-02-24T22:08:05.558240",
+  "parameters": {
+    "edge_strength": 0.5,
+    "angular_resolution": 16,
+    "smoothing": 1.0,
+    "photon_threshold": 10.0,
+    "enhancement_factor": 2.0
+  },
+  "input_file": "outputs/temp/6c21ee40-f2d6-404b-a67a-fde6d12b6d0d_480424420_1168380444800794_4070366163141633820_n.jpg",
+  "image_shape": [
+    2048,
+    1391
+  ],
+  "scale_params": {
+    "min": 0.0,
+    "max": 255.0,
+    "range": 255.0
+  },
+  "visualizations": [
+    "outputs/run_6c21ee40-f2d6-404b-a67a-fde6d12b6d0d/raw.png",
+    "outputs/run_6c21ee40-f2d6-404b-a67a-fde6d12b6d0d/normalized.png",
+    "outputs/run_6c21ee40-f2d6-404b-a67a-fde6d12b6d0d/wavelet_coefficients.png",
+    "outputs/run_6c21ee40-f2d6-404b-a67a-fde6d12b6d0d/wavelet_edge.png",
+    "outputs/run_6c21ee40-f2d6-404b-a67a-fde6d12b6d0d/curvelet_edge.png",
+    "outputs/run_6c21ee40-f2d6-404b-a67a-fde6d12b6d0d/reconstruction.png"
+  ]
+}

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { CoefficientStats } from './CoefficientStats';
+import { PipelineFlow } from './PipelineFlow';
 
 interface VisualizationGridProps {
   runId: string | null;
@@ -18,44 +20,20 @@ const tabs: TabConfig[] = [
   {
     id: 'transform-comparison',
     label: 'Transform Comparison',
-    visualizations: [
-      { filename: 'raw.png', title: 'Original Image' },
-      { filename: 'normalized.png', title: 'Normalized' },
-      { filename: 'wavelet_edge.png', title: 'Wavelet Edges' },
-      { filename: 'curvelet_edge.png', title: 'Curvelet Edges' },
-      { filename: 'difference_map.png', title: 'Difference Map' },
-      { filename: 'reconstruction.png', title: 'Reconstruction' },
-    ],
+    visualizations: [], // Special tab - uses PipelineFlow component instead
   },
   {
     id: 'directional-analysis',
     label: 'Directional Analysis',
     visualizations: [
-      { filename: 'orientation_map.png', title: 'Orientation Map' },
       { filename: 'directional_energy.png', title: 'Directional Energy' },
       { filename: 'angular_distribution.png', title: 'Angular Distribution' },
-      { filename: 'frequency_cone.png', title: 'Frequency Cone' },
     ],
   },
   {
-    id: 'spectral-analysis',
-    label: 'Spectral Analysis',
-    visualizations: [
-      { filename: 'radial_energy.png', title: 'Radial Energy' },
-      { filename: 'scale_energy.png', title: 'Scale Energy' },
-      { filename: 'coefficient_histogram.png', title: 'Coefficient Histogram' },
-      { filename: 'wavelet_coefficients.png', title: 'Wavelet Coefficients' },
-    ],
-  },
-  {
-    id: 'edge-results',
-    label: 'Edge Results',
-    visualizations: [
-      { filename: 'edge_overlay.png', title: 'Edge Overlay' },
-      { filename: 'enhancement_overlay.png', title: 'Enhancement Overlay' },
-      { filename: 'reconstruction_error.png', title: 'Reconstruction Error' },
-      { filename: 'reconstruction_error_curve.png', title: 'Error Curve' },
-    ],
+    id: 'coefficient-stats',
+    label: 'Coefficient Stats',
+    visualizations: [], // Special tab - uses CoefficientStats component instead
   },
 ];
 
@@ -63,8 +41,34 @@ export const VisualizationGrid: React.FC<VisualizationGridProps> = ({ runId, bas
   const [activeTab, setActiveTab] = useState<string>('transform-comparison');
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
+  // Clear errors when runId changes
+  React.useEffect(() => {
+    setImageErrors(new Set());
+  }, [runId]);
+
   const handleImageError = (filename: string) => {
     setImageErrors((prev) => new Set(prev).add(filename));
+  };
+
+  const handleImageLoad = (filename: string) => {
+    // Image loaded successfully - could add logic here if needed
+  };
+
+  const handleImageDownload = async (imageUrl: string, filename: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+    }
   };
 
   const activeTabConfig = tabs.find((tab) => tab.id === activeTab);
@@ -118,9 +122,14 @@ export const VisualizationGrid: React.FC<VisualizationGridProps> = ({ runId, bas
 
       {/* Visualization Grid */}
       <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {activeTabConfig?.visualizations.map((viz) => {
-            const imageUrl = `${baseUrl}/outputs/run_${runId}/${viz.filename}`;
+        {activeTab === 'transform-comparison' ? (
+          <PipelineFlow runId={runId} />
+        ) : activeTab === 'coefficient-stats' ? (
+          <CoefficientStats runId={runId} baseUrl={baseUrl} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {activeTabConfig?.visualizations.map((viz) => {
+            const imageUrl = `${baseUrl}/outputs/run_${runId}/${viz.filename}?t=${Date.now()}`;
             const hasError = imageErrors.has(viz.filename);
 
             return (
@@ -128,8 +137,29 @@ export const VisualizationGrid: React.FC<VisualizationGridProps> = ({ runId, bas
                 key={viz.filename}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
               >
-                <div className="p-4 border-b border-gray-200">
+                <div className="p-4 border-b border-gray-200 flex justify-between items-center">
                   <h3 className="text-sm font-semibold text-gray-900">{viz.title}</h3>
+                  {!hasError && (
+                    <button
+                      onClick={() => handleImageDownload(imageUrl, viz.filename)}
+                      className="text-blue-600 hover:text-blue-800 transition-colors"
+                      title="Download image"
+                    >
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </div>
                 <div className="p-4">
                   {hasError ? (
@@ -149,21 +179,58 @@ export const VisualizationGrid: React.FC<VisualizationGridProps> = ({ runId, bas
                           />
                         </svg>
                         <p className="mt-2 text-xs">Image not available</p>
+                        <p className="mt-1 text-xs text-gray-400">{viz.filename}</p>
                       </div>
                     </div>
                   ) : (
-                    <img
-                      src={imageUrl}
-                      alt={viz.title}
-                      className="w-full h-auto rounded"
-                      onError={() => handleImageError(viz.filename)}
-                    />
+                    <div 
+                      className="relative group cursor-pointer"
+                      onClick={() => handleImageDownload(imageUrl, viz.filename)}
+                      title="Click to download"
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={viz.title}
+                        className="w-full h-auto rounded"
+                        onLoad={() => handleImageLoad(viz.filename)}
+                        onError={() => handleImageError(viz.filename)}
+                        style={{ 
+                          minHeight: '200px', 
+                          backgroundColor: '#f3f4f6',
+                          // FIX #1: Auto-brighten edge images more aggressively for visibility
+                          filter: viz.filename.includes('edge') 
+                            ? 'brightness(3) contrast(2)'  // Much stronger for edge images
+                            : activeTab === 'transform-comparison' 
+                              ? 'brightness(1.5) contrast(1.2)'  // Moderate for other transform images
+                              : 'none'  // Natural for plots
+                        }}
+                      />
+                      {/* Download overlay on hover */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 rounded flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white rounded-full p-3 shadow-lg">
+                          <svg
+                            className="h-6 w-6 text-blue-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
             );
           })}
         </div>
+        )}
       </div>
     </div>
   );

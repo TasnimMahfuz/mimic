@@ -12,6 +12,7 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Dict, Tuple, Optional
 import logging
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -285,7 +286,17 @@ class FFTDirectionalFilter:
         # Sum all directional coefficients
         for scale in range(coefficients.scales):
             for angle_idx in coefficients.coefficients[scale].keys():
-                reconstructed += coefficients.coefficients[scale][angle_idx]
+                coeff = coefficients.coefficients[scale][angle_idx]
+                
+                # Resize coefficient to match output shape if needed
+                if coeff.shape != coefficients.shape:
+                    coeff = cv2.resize(
+                        coeff,
+                        (coefficients.shape[1], coefficients.shape[0]),
+                        interpolation=cv2.INTER_LINEAR
+                    )
+                
+                reconstructed += coeff
         
         # Normalize by number of orientations to approximate original scale
         # This is a heuristic normalization
@@ -356,6 +367,14 @@ class FFTDirectionalFilter:
         for scale in range(coefficients.scales):
             for angle_idx, coeffs in coefficients.coefficients[scale].items():
                 magnitude = np.abs(coeffs)
+                
+                # Resize magnitude to match output shape if needed
+                if magnitude.shape != (h, w):
+                    magnitude = cv2.resize(
+                        magnitude,
+                        (w, h),
+                        interpolation=cv2.INTER_LINEAR
+                    )
                 
                 # Update orientation map where this orientation is strongest
                 mask = magnitude > max_magnitude

@@ -1,10 +1,20 @@
 import os
+import logging
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.api.routes import auth, mimic, materials, chat
 from app.db.base import Base
 from app.db.session import engine, SessionLocal
 from app.db.init_db import init_db
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 
 # Initialize database tables
@@ -32,6 +42,14 @@ app.include_router(auth.router, prefix="/auth")
 app.include_router(mimic.router, prefix="/mimic")
 app.include_router(materials.router, prefix="/materials")
 app.include_router(chat.router, prefix="/chat")
+
+# ========== STATIC FILES FOR OUTPUTS ==========
+# Ensure outputs directory exists
+outputs_dir = Path("outputs")
+outputs_dir.mkdir(parents=True, exist_ok=True)
+
+# Mount static files to serve visualization images
+app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
 # ========== HEALTH CHECK ==========
 @app.get("/")

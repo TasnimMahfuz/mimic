@@ -165,13 +165,16 @@ class FileProcessor:
         normalize: bool = True
     ) -> Path:
         """
-        Save image to file.
+        Save image to file with percentile stretch for better contrast.
+        
+        Uses 1st-99th percentile stretch to preserve scientific contrast
+        and prevent black outputs from very small coefficient values.
         
         Args:
             image: Image data as numpy array
             path: Output file path
             format: Image format ('png', 'jpeg', 'tiff')
-            normalize: Whether to normalize to [0, 255] range
+            normalize: Whether to apply percentile stretch (default: True)
         
         Returns:
             Path to saved file
@@ -187,32 +190,43 @@ class FileProcessor:
             
             # Prepare image for saving
             if normalize:
-                # Normalize to [0, 255] range
-                img_min = np.min(image)
-                img_max = np.max(image)
+                # Handle NaN values
+                img = np.nan_to_num(image, nan=0.0, posinf=0.0, neginf=0.0)
                 
-                if img_max > img_min:
-                    image_normalized = ((image - img_min) / (img_max - img_min) * 255)
+                # Apply percentile stretch for better contrast
+                # This preserves scientific features better than min-max
+                p1, p99 = np.percentile(img, (1, 99))
+                
+                # Clip to percentile range
+                img_clipped = np.clip(img, p1, p99)
+                
+                # Normalize to [0, 1] range
+                if p99 > p1:
+                    img_normalized = (img_clipped - p1) / (p99 - p1 + 1e-8)
                 else:
-                    image_normalized = np.zeros_like(image)
+                    # Constant image or very small range
+                    img_normalized = np.zeros_like(img)
                 
-                image_to_save = image_normalized.astype(np.uint8)
+                # Scale to [0, 255] and convert to uint8
+                image_to_save = (img_normalized * 255).astype(np.uint8)
             else:
-                # Clip to [0, 255] and convert
+                # Direct conversion without normalization
                 image_to_save = np.clip(image, 0, 255).astype(np.uint8)
             
-            # Save using PIL for better format support
+            # Save using OpenCV for consistency
             try:
+                import cv2
+                cv2.imwrite(str(path), image_to_save)
+                abs_path = path.resolve()
+                logger.info(f"Saved image to {path} (absolute: {abs_path})")
+            
+            except ImportError:
+                # Fallback to PIL
                 from PIL import Image
                 img = Image.fromarray(image_to_save, mode='L')
                 img.save(path, format=format.upper())
-                logger.info(f"Saved image to {path}")
-            
-            except ImportError:
-                # Fallback to OpenCV
-                import cv2
-                cv2.imwrite(str(path), image_to_save)
-                logger.info(f"Saved image to {path} using OpenCV")
+                abs_path = path.resolve()
+                logger.info(f"Saved image to {path} (absolute: {abs_path}) using PIL")
             
             return path
         
