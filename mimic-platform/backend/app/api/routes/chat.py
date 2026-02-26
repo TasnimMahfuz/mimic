@@ -58,7 +58,7 @@ def chat_query(
         
         # Step 2: Generate response
         if context:
-            # Generate response using retrieved context
+            # Generate response using retrieved context (RAG mode)
             try:
                 response = llm_service.generate_response(context, query_text)
                 return ChatResponse(
@@ -75,16 +75,35 @@ def chat_query(
                     status="degraded"
                 )
         else:
-            # No context found - still return 200 with graceful message
-            logger.warning(f"No context found for query: {query_text}")
-            return ChatResponse(
-                response=(
-                    "I don't have relevant information to answer your question. "
-                    "Please check the uploaded materials or ask something else."
-                ),
-                context="",
-                status="no_context"
-            )
+            # No context found - chat directly with LLM (no RAG)
+            logger.info(f"No context found, using direct LLM chat for query: {query_text}")
+            try:
+                # Direct LLM chat without context
+                messages = [
+                    {"role": "system", "content": "You are a helpful AI assistant. Answer questions directly and conversationally."},
+                    {"role": "user", "content": query_text}
+                ]
+                
+                from langchain_core.messages import HumanMessage, SystemMessage
+                llm_messages = [
+                    SystemMessage(content="You are a helpful AI assistant. Answer questions directly and conversationally."),
+                    HumanMessage(content=query_text)
+                ]
+                
+                response = llm_service.client.invoke(llm_messages)
+                return ChatResponse(
+                    response=response.content,
+                    context="",
+                    status="direct_llm"
+                )
+            except Exception as e:
+                logger.error(f"Direct LLM chat failed: {e}", exc_info=True)
+                print(f"DEBUG: Direct LLM error: {type(e).__name__}: {str(e)}")
+                return ChatResponse(
+                    response=f"I encountered an issue: {str(e)}. Please check the backend logs.",
+                    context="",
+                    status="error"
+                )
     
     except Exception as e:
         # Catch unexpected errors - return 200 with safe message

@@ -16,7 +16,7 @@ class LLMService:
         
         self.client = ChatGroq(
             api_key=api_key,
-            model="llama-3.1-70b-versatile",
+            model="llama-3.1-8b-instant",
             temperature=0.7,
             max_tokens=512,
             timeout=30

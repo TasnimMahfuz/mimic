@@ -19,7 +19,7 @@ interface TabConfig {
 const tabs: TabConfig[] = [
   {
     id: 'transform-comparison',
-    label: 'Transform Comparison',
+    label: 'MIMIC Pipeline Overview',
     visualizations: [], // Special tab - uses PipelineFlow component instead
   },
   {
@@ -31,20 +31,71 @@ const tabs: TabConfig[] = [
     ],
   },
   {
-    id: 'coefficient-stats',
-    label: 'Coefficient Stats',
-    visualizations: [], // Special tab - uses CoefficientStats component instead
+    id: 'image-properties',
+    label: 'Image Properties',
+    visualizations: [],
+  },
+  {
+    id: 'transform-info',
+    label: 'Transform Info',
+    visualizations: [],
+  },
+  {
+    id: 'edge-detection',
+    label: 'Edge Detection',
+    visualizations: [],
+  },
+  {
+    id: 'energy',
+    label: 'Energy',
+    visualizations: [],
+  },
+  {
+    id: 'directional',
+    label: 'Directional',
+    visualizations: [],
+  },
+  {
+    id: 'download',
+    label: 'Download',
+    visualizations: [],
   },
 ];
 
 export const VisualizationGrid: React.FC<VisualizationGridProps> = ({ runId, baseUrl }) => {
   const [activeTab, setActiveTab] = useState<string>('transform-comparison');
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   // Clear errors when runId changes
   React.useEffect(() => {
     setImageErrors(new Set());
   }, [runId]);
+
+  // Fetch coefficient stats from separate file
+  React.useEffect(() => {
+    const fetchStats = async () => {
+      if (!runId) return;
+      try {
+        setLoading(true);
+        const response = await fetch(`${baseUrl}/outputs/run_${runId}/coefficient_stats.json`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Coefficient stats loaded:', data);
+          setStats(data);
+        } else {
+          setStats(null);
+        }
+      } catch (err) {
+        console.error('Failed to load coefficient stats:', err);
+        setStats(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, [runId, baseUrl]);
 
   const handleImageError = (filename: string) => {
     setImageErrors((prev) => new Set(prev).add(filename));
@@ -124,8 +175,278 @@ export const VisualizationGrid: React.FC<VisualizationGridProps> = ({ runId, bas
       <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
         {activeTab === 'transform-comparison' ? (
           <PipelineFlow runId={runId} />
-        ) : activeTab === 'coefficient-stats' ? (
-          <CoefficientStats runId={runId} baseUrl={baseUrl} />
+        ) : activeTab === 'image-properties' ? (
+          <div className="max-w-4xl mx-auto">
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : stats?.image_properties ? (
+              <div className="bg-white rounded-lg p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Image Properties</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="border-l-4 border-blue-500 pl-4">
+                    <p className="text-sm text-gray-600">Dimensions</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.image_properties.width} × {stats.image_properties.height}
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-purple-500 pl-4">
+                    <p className="text-sm text-gray-600">Total Pixels</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.image_properties.total_pixels.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="border-l-4 border-green-500 pl-4">
+                    <p className="text-sm text-gray-600">Intensity Range</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stats.image_properties.intensity_range.toFixed(1)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-500">
+                <p>No statistics available. Run a new analysis to generate statistics.</p>
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'transform-info' ? (
+          <div className="max-w-4xl mx-auto">
+            {stats?.transform_info ? (
+              <div className="bg-white rounded-lg p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Transform Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-blue-50 to-white">
+                    <h4 className="font-semibold text-gray-900 mb-3">Wavelet Transform</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Type:</span>
+                        <span className="font-medium text-gray-900">{stats.transform_info.wavelet.type}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Levels:</span>
+                        <span className="font-medium text-gray-900">{stats.transform_info.wavelet.levels}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Subbands:</span>
+                        <span className="font-medium text-gray-900">{stats.transform_info.wavelet.total_subbands}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-purple-50 to-white">
+                    <h4 className="font-semibold text-gray-900 mb-3">Curvelet Transform</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Scales:</span>
+                        <span className="font-medium text-gray-900">{stats.transform_info.curvelet.scales}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Orientations:</span>
+                        <span className="font-medium text-gray-900">{stats.transform_info.curvelet.orientations}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Subbands:</span>
+                        <span className="font-medium text-gray-900">{stats.transform_info.curvelet.total_subbands}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-500">
+                <p>No statistics available.</p>
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'edge-detection' ? (
+          <div className="max-w-4xl mx-auto">
+            {stats?.edge_detection ? (
+              <div className="bg-white rounded-lg p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Edge Detection</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Wavelet</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Edge Pixels:</span>
+                        <span className="text-lg font-bold text-gray-900">{stats.edge_detection.wavelet_edges.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Density:</span>
+                        <span className="text-lg font-bold text-blue-600">{stats.edge_detection.wavelet_edge_density_percent.toFixed(2)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Curvelet</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Edge Pixels:</span>
+                        <span className="text-lg font-bold text-gray-900">{stats.edge_detection.curvelet_edges.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Density:</span>
+                        <span className="text-lg font-bold text-purple-600">{stats.edge_detection.curvelet_edge_density_percent.toFixed(2)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-500">
+                <p>No statistics available.</p>
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'energy' ? (
+          <div className="max-w-4xl mx-auto">
+            {stats?.energy_distribution ? (
+              <div className="bg-white rounded-lg p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Energy Distribution</h3>
+                <div className="mb-4">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Total Energy:</span>
+                    <span className="text-lg font-bold text-gray-900">{stats.energy_distribution.total_energy.toExponential(2)}</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {Object.entries(stats.energy_distribution.scale_energy_percentages).map(([scale, percentage]: [string, any]) => (
+                    <div key={scale}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-700">Scale {scale}</span>
+                        <span className="font-semibold text-gray-900">{percentage.toFixed(1)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-600 h-2 rounded-full" style={{ width: `${percentage}%` }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-500">
+                <p>No statistics available.</p>
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'directional' ? (
+          <div className="max-w-4xl mx-auto">
+            {stats?.directional_analysis ? (
+              <div className="bg-white rounded-lg p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Directional Analysis</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border-l-4 border-indigo-500 pl-4">
+                    <p className="text-sm text-gray-600">Dominant Direction</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.directional_analysis.dominant_angle_degrees.toFixed(1)}°</p>
+                  </div>
+                  <div className="border-l-4 border-pink-500 pl-4">
+                    <p className="text-sm text-gray-600">Mean Anisotropy</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.directional_analysis.anisotropy_mean.toFixed(3)}</p>
+                  </div>
+                  <div className="border-l-4 border-orange-500 pl-4">
+                    <p className="text-sm text-gray-600">Anisotropy Std</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.directional_analysis.anisotropy_std.toFixed(3)}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-500">
+                <p>No statistics available.</p>
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'download' ? (
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Download Statistics Report</h3>
+              <p className="text-gray-600 mb-6">Download all coefficient statistics as a formatted text report.</p>
+              <button
+                onClick={() => {
+                  if (!stats) return;
+                  
+                  const content = `COEFFICIENT STATISTICS REPORT
+Run ID: ${runId}
+Generated: ${new Date().toLocaleString()}
+
+================================================================================
+IMAGE PROPERTIES
+================================================================================
+Dimensions:        ${stats.image_properties?.width} × ${stats.image_properties?.height}
+Total Pixels:      ${stats.image_properties?.total_pixels.toLocaleString()}
+Intensity Min:     ${stats.image_properties?.intensity_min.toFixed(2)}
+Intensity Max:     ${stats.image_properties?.intensity_max.toFixed(2)}
+Intensity Range:   ${stats.image_properties?.intensity_range.toFixed(2)}
+
+================================================================================
+TRANSFORM INFORMATION
+================================================================================
+Wavelet Transform:
+  Type:            ${stats.transform_info?.wavelet.type}
+  Levels:          ${stats.transform_info?.wavelet.levels}
+  Total Subbands:  ${stats.transform_info?.wavelet.total_subbands}
+
+Curvelet Transform:
+  Type:            ${stats.transform_info?.curvelet.type}
+  Scales:          ${stats.transform_info?.curvelet.scales}
+  Orientations:    ${stats.transform_info?.curvelet.orientations}
+  Total Subbands:  ${stats.transform_info?.curvelet.total_subbands}
+
+================================================================================
+EDGE DETECTION
+================================================================================
+Wavelet Edges:
+  Edge Pixels:     ${stats.edge_detection?.wavelet_edges.toLocaleString()}
+  Density:         ${stats.edge_detection?.wavelet_edge_density_percent.toFixed(2)}%
+
+Curvelet Edges:
+  Edge Pixels:     ${stats.edge_detection?.curvelet_edges.toLocaleString()}
+  Density:         ${stats.edge_detection?.curvelet_edge_density_percent.toFixed(2)}%
+
+================================================================================
+ENERGY DISTRIBUTION
+================================================================================
+Total Energy:      ${stats.energy_distribution?.total_energy.toExponential(2)}
+
+Energy per Scale:
+${Object.entries(stats.energy_distribution?.scale_energy_percentages || {}).map(([scale, pct]: [string, any]) => 
+  `  Scale ${scale}:        ${pct.toFixed(2)}%`
+).join('\n')}
+
+================================================================================
+DIRECTIONAL ANALYSIS
+================================================================================
+Dominant Direction:  ${stats.directional_analysis?.dominant_angle_degrees.toFixed(1)}°
+Angular Resolution:  ${stats.directional_analysis?.angular_resolution}
+Mean Anisotropy:     ${stats.directional_analysis?.anisotropy_mean.toFixed(3)}
+Anisotropy Std Dev:  ${stats.directional_analysis?.anisotropy_std.toFixed(3)}
+
+================================================================================
+END OF REPORT
+================================================================================
+`;
+                  
+                  const blob = new Blob([content], { type: 'text/plain' });
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = `coefficient_stats_${runId}.txt`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+                }}
+                disabled={!stats}
+                className={`px-6 py-3 rounded-lg transition-colors ${
+                  stats 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Download Report (.txt)
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {activeTabConfig?.visualizations.map((viz) => {

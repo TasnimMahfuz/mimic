@@ -38,7 +38,12 @@ export const ChatPage: React.FC = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    console.log('Adding user message:', userMessage);
+    setMessages((prev) => {
+      const newMessages = [...prev, userMessage];
+      console.log('Messages after adding user:', newMessages);
+      return newMessages;
+    });
     setInput('');
     setError(null);
     setIsLoading(true);
@@ -85,6 +90,7 @@ export const ChatPage: React.FC = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto mb-6 space-y-4">
+        {console.log('Rendering messages, count:', messages.length)}
         {messages.length === 0 ? (
           <Card className="h-full flex items-center justify-center text-center">
             <div>
@@ -105,23 +111,23 @@ export const ChatPage: React.FC = () => {
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xl ${message.role === 'user' ? 'order-2' : 'order-1'}`}>
-                  <Card
-                    className={`cursor-pointer hover:shadow-lg transition-shadow ${
+                  <div
+                    className={`rounded-lg p-6 shadow-md border cursor-pointer hover:shadow-lg transition-shadow ${
                       message.role === 'user'
-                        ? 'bg-primary text-white border-primary shadow-md'
-                        : 'bg-white border-neutral-200'
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white border-gray-200 text-gray-900'
                     }`}
                     onClick={() =>
                       message.debugResponse && setExpandedMessage(expandedMessage === message.id ? null : message.id)
                     }
                   >
-                    <p className={`text-sm ${message.role === 'user' ? 'text-white' : 'text-neutral-600'}`}>
+                    <p className={`text-sm ${message.role === 'user' ? 'text-blue-100' : 'text-gray-600'}`}>
                       {message.timestamp}
                     </p>
-                    <p className={`mt-2 ${message.role === 'user' ? 'text-white' : 'text-neutral-900'} whitespace-pre-wrap break-words`}>
+                    <p className={`mt-2 whitespace-pre-wrap break-words`}>
                       {String(message.content)}
                     </p>
-                  </Card>
+                  </div>
 
                   {/* Context Panel for Assistant Messages */}
                   {message.role === 'assistant' && message.context ? (

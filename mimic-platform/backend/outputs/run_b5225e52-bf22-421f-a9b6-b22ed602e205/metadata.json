@@ -1,0 +1,40 @@
+{
+  "run_id": "b5225e52-bf22-421f-a9b6-b22ed602e205",
+  "timestamp": "2026-02-25T22:22:19.059535",
+  "parameters": {
+    "edge_strength": 0.5,
+    "angular_resolution": 16,
+    "smoothing": 1.0,
+    "photon_threshold": 10.0,
+    "enhancement_factor": 2.0
+  },
+  "input_file": "outputs/temp/b5225e52-bf22-421f-a9b6-b22ed602e205_12_images.jpeg",
+  "image_shape": [
+    168,
+    299
+  ],
+  "scale_params": {
+    "min": 64.0,
+    "max": 255.0,
+    "range": 191.0
+  },
+  "visualizations": [
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/raw.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/normalized.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/wavelet_coefficients.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/wavelet_edge.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/curvelet_edge.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/reconstruction.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/radial_energy.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/coefficient_histogram.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/scale_energy.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/frequency_cone.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/reconstruction_error_curve.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/directional_energy.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/angular_distribution.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/anisotropy_map.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/orientation_map.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/frequency_cone.png",
+    "outputs/run_b5225e52-bf22-421f-a9b6-b22ed602e205/edge_overlay.png"
+  ]
+}

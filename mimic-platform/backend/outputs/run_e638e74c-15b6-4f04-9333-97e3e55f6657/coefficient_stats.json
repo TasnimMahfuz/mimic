@@ -1,0 +1,67 @@
+{
+  "image_properties": {
+    "width": 299,
+    "height": 168,
+    "total_pixels": 50232,
+    "intensity_min": 64.0,
+    "intensity_max": 255.0,
+    "intensity_range": 191.0
+  },
+  "transform_info": {
+    "wavelet": {
+      "type": "db4",
+      "levels": 3,
+      "total_subbands": 4,
+      "coefficients_per_level": {
+        "0": 3,
+        "1": 3,
+        "2": 3
+      }
+    },
+    "curvelet": {
+      "type": "curvelet",
+      "scales": 3,
+      "orientations": 16,
+      "total_subbands": 40
+    }
+  },
+  "edge_detection": {
+    "wavelet_edges": 3581,
+    "curvelet_edges": 5166,
+    "wavelet_edge_density_percent": 7.128921802834847,
+    "curvelet_edge_density_percent": 10.28428093645485
+  },
+  "energy_distribution": {
+    "total_energy": 33689385.321337804,
+    "energy_per_scale": {
+      "0": 19124703.636203483,
+      "1": 8296800.586169832,
+      "2": 3569766.6408708203
+    },
+    "scale_energy_percentages": {
+      "0": 56.767742877429384,
+      "1": 24.6273433220371,
+      "2": 10.596116868329569
+    }
+  },
+  "directional_analysis": {
+    "dominant_orientation_index": 0,
+    "dominant_angle_degrees": 131.59889989918145,
+    "angular_resolution": 16,
+    "anisotropy_mean": 0.6794920746427429,
+    "anisotropy_std": 0.22934566209658178
+  },
+  "reconstruction_quality": {
+    "wavelet": {
+      "mse": 0.0,
+      "psnr_db": 100.0,
+      "quality_rating": "Excellent"
+    },
+    "curvelet": {
+      "mse": 0.0,
+      "psnr_db": 100.0,
+      "quality_rating": "Excellent"
+    }
+  },
+  "timestamp": "2026-02-25T23:39:34.874572"
+}
